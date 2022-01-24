@@ -9,10 +9,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static java.util.Objects.isNull;
+
 // Instead of reading a bunch of words the game doesn't understand, we take all the words from the JS file ;)
 public class ExtractFromScriptDictionary implements Dictionary {
     private final static Pattern FIVE_TOKENS_PATTERN = Pattern.compile("\"[a-z]{5}\"");
     private final Page page;
+    private List<String> wordList;
 
     public ExtractFromScriptDictionary(Page page) {
         this.page = page;
@@ -20,11 +23,16 @@ public class ExtractFromScriptDictionary implements Dictionary {
 
     @Override
     public List<String> wordList() {
-        final Response response = page.waitForResponse(r -> r.url().contains("main") && r.url().endsWith("js"), () -> {
-            this.page.navigate("https://www.powerlanguage.co.uk/wordle/");
-        });
+        if(isNull(wordList)) {
+            final Response response = page.waitForResponse(r -> r.url().contains("main") && r.url().endsWith("js"), () -> {
+                this.page.navigate("https://www.powerlanguage.co.uk/wordle/");
+                this.page.click(".close-icon");
+            });
 
-        return extractWordList(response);
+            wordList = extractWordList(response);
+        }
+
+        return wordList;
     }
 
     private List<String> extractWordList(Response r) {

@@ -1,6 +1,9 @@
 package be.tomcools.wordleplaywright;
 
+import be.tomcools.wordleplaywright.dictionary.Dictionary;
 import be.tomcools.wordleplaywright.dictionary.ExtractFromScriptDictionary;
+import be.tomcools.wordleplaywright.dictionary.FileDictionary;
+import be.tomcools.wordleplaywright.dictionary.InstaWinDictionary;
 import be.tomcools.wordleplaywright.wordselector.WordSelector;
 import be.tomcools.wordleplaywright.pages.WordlePage;
 import com.microsoft.playwright.Browser;
@@ -17,8 +20,14 @@ public class RunWordle {
     public static void main(String[] args) {
         runWithPlayWright((browser -> {
             final Page p = browser.newContext().newPage();
-            final ExtractFromScriptDictionary ex = new ExtractFromScriptDictionary(p);
-            final WordSelector wordSelector = new WordSelector(ex.wordList());
+
+            // Choose one of these ;)
+            // Read dictionary file: FileDictionary fileDictionary = new FileDictionary();
+            // Extract dictionary from JS: ExtractFromScriptDictionary extractFromJsFile = new ExtractFromScriptDictionary(p);
+            // Strip solution from LocalStorage using JS: InstaWinDictionary instaWinDictionary = new InstaWinDictionary(p);
+            Dictionary dictionary = new InstaWinDictionary(p);
+
+            final WordSelector wordSelector = new WordSelector(dictionary);
 
             solveWordle(new WordlePage(p), wordSelector);
 

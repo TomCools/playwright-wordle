@@ -4,7 +4,7 @@ This is an experiment project I used to learn more about UI Automation with Play
 
 What's in this repository:
 
-- 2 ways to get a list of words: from a file, or directly from the game's javascript file;
+- 3 ways to get a list of words: from a file, directly from the game's javascript file... or basically cheating big time;
 - A solver, to select appropriate next words, with some minor optimizations (avoid words with double occurances of the same characters);
 - A [Page Object](WordlePage) class containing the Playwright code to interact with the page;
 

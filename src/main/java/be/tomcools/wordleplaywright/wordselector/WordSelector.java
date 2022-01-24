@@ -1,5 +1,6 @@
 package be.tomcools.wordleplaywright.wordselector;
 
+import be.tomcools.wordleplaywright.dictionary.Dictionary;
 import be.tomcools.wordleplaywright.state.LetterState;
 
 import java.util.Collections;
@@ -9,24 +10,21 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class WordSelector {
-    private List<String> words;
+    private Dictionary dictionary;
 
-    public WordSelector(List<String> words) {
-        this.words = words;
+    public WordSelector(Dictionary dictionary) {
+        this.dictionary = dictionary;
     }
 
     public String determineNextWord(LetterState letterState) {
-        final List<String> validWords = words.stream()
+        final List<String> validWords = dictionary.wordList()
+                .stream()
                 .filter(letterState::isPossibility)
                 .collect(Collectors.toList());
 
         final String selectedWord = optimize(validWords);
 
         validWords.remove(selectedWord);
-
-        // Set the word list to only the remaining valid words.
-        // Next loops of letterState will resolve it in this case.
-        this.words = validWords;
 
         return selectedWord;
     }
