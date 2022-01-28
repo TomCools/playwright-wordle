@@ -2,7 +2,10 @@ package be.tomcools.wordleplaywright.pages;
 
 import be.tomcools.wordleplaywright.wordselector.MatchedLetters;
 import be.tomcools.wordleplaywright.state.LetterState;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.microsoft.playwright.ElementHandle;
+import com.microsoft.playwright.JSHandle;
 import com.microsoft.playwright.Page;
 
 import java.util.ArrayList;
@@ -27,7 +30,8 @@ public class WordlePage {
     }
 
     public void selectLetter(char character) {
-        activePage.click("button[data-key=%s]".formatted(character));
+        // The String.valueOf() is required for some special symbols (like: ❤)
+        activePage.click("button[data-key=%s]".formatted(String.valueOf(character)));
     }
 
     public void typeWord(String word) {
@@ -82,5 +86,28 @@ public class WordlePage {
     public boolean isGameOver() {
         ElementHandle element = activePage.querySelector("#game-toaster");
         return nonNull(element) && element.isVisible();
+    }
+
+    public void adjustSolution(String solution) {
+        final Gson gson = new Gson();
+
+        final JSHandle jsHandle = activePage.evaluateHandle("localStorage.gameState");
+        JsonObject obj = gson.fromJson((String)jsHandle.jsonValue(),JsonObject.class);
+        obj.addProperty("solution",solution);
+        final String newState = gson.toJson(obj);
+        activePage.evaluateHandle("localStorage.gameState='"+newState+"'");
+
+        if(solution.contains("❤")) {
+            this.addButton("❤");
+        }
+    }
+
+    private void addButton(String input) {
+        // clone the existing a element
+        activePage.evalOnSelector("[data-key='a']", "el => el.parentElement.appendChild(el.cloneNode(true))");
+        // change 1 of the A values, the last one.
+        activePage.evalOnSelector("[data-key='a']  >> nth=-1", "el => el.setAttribute('data-key','"+input+"')");
+        // change the button content.
+        activePage.evalOnSelector("[data-key='"+input+"']", "el => el.innerHTML='"+input+"'");
     }
 }

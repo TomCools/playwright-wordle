@@ -30,6 +30,7 @@ public class ExtractFromScriptDictionary implements Dictionary {
             });
 
             wordList = extractWordList(response);
+            wordList.add("java❤");
         }
 
         return wordList;
